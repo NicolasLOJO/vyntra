@@ -1,0 +1,76 @@
+/* Surface transparente — laisse passer le bureau Windows en dessous. */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  color: #fff;
+}
+
+.vyntra-surface {
+  position: fixed;
+  inset: 0;
+  /* En mode édition, on assombrit légèrement pour montrer la grille. */
+  transition: background 200ms ease;
+}
+
+.vyntra-surface[data-edit="true"] {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.vyntra-cell {
+  border-radius: 14px;
+  overflow: hidden;
+  /* Liquid Glass: backdrop-filter (fallback si non supporté) */
+  backdrop-filter: blur(20px) saturate(140%);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vyntra-widget-frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.vyntra-edit-toggle {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(20px);
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.vyntra-edit-toggle[data-active="true"] {
+  background: rgba(80, 140, 255, 0.7);
+}
+
+.vyntra-dev-panel {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(20, 20, 20, 0.75);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  line-height: 1.5;
+  pointer-events: none;
+}
+.vyntra-dev-panel strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #88aaff;
+}

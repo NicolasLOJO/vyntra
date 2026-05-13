@@ -1,0 +1,45 @@
+[package]
+name = "vyntra-desktop"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Vyntra desktop runtime"
+
+[lib]
+name = "vyntra_desktop_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# Internes
+vyn-format = { workspace = true }
+vyn-manifest = { workspace = true }
+vyn-sandbox = { workspace = true }
+
+# Tauri
+tauri = { version = "2", features = ["protocol-asset", "unstable"] }
+tauri-plugin-shell = "2"
+
+# Async + logs
+tokio = { workspace = true }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Serialization / erreurs
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# System info
+sysinfo = "0.31"
+
+# Verrous async
+parking_lot = "0.12"
+dashmap = "6"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

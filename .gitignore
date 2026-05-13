@@ -1,0 +1,23 @@
+# Node
+node_modules/
+dist/
+.pnpm-store/
+*.log
+
+# Rust
+target/
+**/*.rs.bk
+
+# Tauri
+src-tauri/gen/
+src-tauri/target/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Env
+.env
+.env.local

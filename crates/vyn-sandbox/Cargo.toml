@@ -1,0 +1,10 @@
+[package]
+name = "vyn-sandbox"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+vyn-manifest = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }

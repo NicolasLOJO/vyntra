@@ -1,0 +1,1 @@
+{"default":{"identifier":"default","description":"Capabilities du front Vyntra (pas des widgets tiers).","local":true,"windows":["vyntra-surface"],"permissions":["core:default","core:window:allow-set-ignore-cursor-events","core:event:default","shell:allow-open"]}}
