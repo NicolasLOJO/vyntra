@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  release:
+    name: Build & publish — ${{ matrix.platform }}
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+          # macOS and Linux can be uncommented when ready:
+          # - platform: macos-latest
+          #   target: aarch64-apple-darwin
+          # - platform: ubuntu-22.04
+          #   target: x86_64-unknown-linux-gnu
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Pack bundled widgets
+        run: pnpm pack:examples
+
+      - name: Build & release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          projectPath: ./apps/desktop
+          tagName: ${{ github.ref_name }}
+          releaseName: Vyntra ${{ github.ref_name }}
+          releaseBody: |
+            ## Installation
+
+            Télécharge et exécute le fichier `.exe` ci-dessous pour installer Vyntra.
+
+            Les mises à jour futures se feront automatiquement depuis l'application.
+          releaseDraft: false
+          prerelease: false
+          args: --target ${{ matrix.target }}
