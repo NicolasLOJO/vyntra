@@ -37,6 +37,7 @@ pub fn open_manager<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
 ///
 /// - Mica         : Windows 11 Build 22000+
 /// - Acrylic      : Windows 10 Build 17134 (1803)+
+///
 /// Échoue silencieusement si la version Windows ne supporte aucun des deux effets.
 #[cfg(target_os = "windows")]
 fn apply_backdrop<R: Runtime>(window: &tauri::WebviewWindow<R>) {

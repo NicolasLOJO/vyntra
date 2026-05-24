@@ -36,6 +36,7 @@ pub fn uninstall(state: &AppState, id: &str) -> bool {
 }
 
 /// Dossier où Vyntra stocke les `.vyn` installés.
+#[allow(dead_code)]
 pub fn install_dir<R: Runtime>(app: &AppHandle<R>) -> anyhow::Result<PathBuf> {
     let base = app.path().app_local_data_dir()?;
     let dir = base.join("widgets");

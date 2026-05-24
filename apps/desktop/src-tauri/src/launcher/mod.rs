@@ -118,7 +118,7 @@ mod platform {
             })
             .map(|a| AppEntry { id: a.app_id, name: a.name })
             .collect();
-        entries.sort_by(|a, b| a.name.to_ascii_lowercase().cmp(&b.name.to_ascii_lowercase()));
+        entries.sort_by_key(|a| a.name.to_ascii_lowercase());
         entries
     }
 
@@ -131,7 +131,7 @@ mod platform {
                 scan_lnk_dir(&dir, &mut entries);
             }
         }
-        entries.sort_by(|a, b| a.name.to_ascii_lowercase().cmp(&b.name.to_ascii_lowercase()));
+        entries.sort_by_key(|a| a.name.to_ascii_lowercase());
         entries.dedup_by(|b, a| a.name.eq_ignore_ascii_case(&b.name));
         entries
     }
@@ -158,6 +158,7 @@ mod platform {
     // SHParseDisplayName non plus — on les déclare manuellement.
     // shell32 et ole32 sont déjà liés via Win32_UI_Shell / Win32_System_Com.
     #[repr(C)]
+    #[allow(clippy::upper_case_acronyms)]
     struct ITEMIDLIST { _opaque: u8 }
 
     extern "system" {

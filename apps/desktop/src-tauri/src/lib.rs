@@ -103,7 +103,7 @@ pub fn run() {
                 #[cfg(target_os = "windows")]
                 window::pin_surface_to_bottom(&w);
                 #[cfg(debug_assertions)]
-                let _ = w.open_devtools();
+                w.open_devtools();
             }
 
             // Surfaces supplémentaires pour les moniteurs secondaires.
