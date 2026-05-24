@@ -46,6 +46,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Set version from tag
+        shell: bash
+        run: |
+          VERSION="${{ github.ref_name }}"
+          node scripts/set-version.mjs "${VERSION#v}"
+
       - name: Pack bundled widgets
         run: pnpm pack:examples
 
