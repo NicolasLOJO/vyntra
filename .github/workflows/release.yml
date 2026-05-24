@@ -11,6 +11,11 @@ jobs:
     permissions:
       contents: write
 
+    # Signing env vars au niveau du job so every subprocess (tauri build, etc.) sees them
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -55,12 +60,19 @@ jobs:
       - name: Pack bundled widgets
         run: pnpm pack:examples
 
+      - name: Check signing key is present
+        shell: bash
+        run: |
+          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            echo "::error::TAURI_SIGNING_PRIVATE_KEY secret is not set — add it in Settings > Secrets > Actions"
+            exit 1
+          fi
+          echo "Signing key present (${#TAURI_SIGNING_PRIVATE_KEY} chars)"
+
       - name: Build & release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: ./apps/desktop
           tagName: ${{ github.ref_name }}
