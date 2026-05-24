@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build shared packages
+        run: pnpm --filter @vyntra/widget-types build && pnpm --filter @vyntra/sdk build
+
       - name: TypeScript check
         run: pnpm typecheck
 
