@@ -9,6 +9,7 @@ export default defineConfig({
   server: {
     port: 1420,
     strictPort: true,
+    hmr: true
   },
   build: {
     target: "chrome110",

@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState, useCallback, useMemo, forwardRef } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+  forwardRef,
+} from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, emit } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -6,7 +13,12 @@ import { GridSurface } from "./GridSurface";
 import { installDispatcher } from "../runtime/dispatcher";
 import type { WidgetSummary } from "./types";
 
-interface CssRect { x: number; y: number; w: number; h: number; }
+interface CssRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
 
 /**
  * Surface = overlay desktop. Ne contient QUE la grille de widgets.
@@ -54,7 +66,7 @@ export function Surface() {
       const r = devPanelRef.current.getBoundingClientRect();
       rects.push(toPhys({ x: r.left, y: r.top, w: r.width, h: r.height }));
     }
-
+    console.log("set_hit_rects", rects);
     invoke("set_hit_rects", { rects }).catch(() => {});
   }, [widgetCssRects, winPos]);
 
@@ -71,23 +83,29 @@ export function Surface() {
 
   useEffect(() => {
     // Vérifie si c'est le premier lancement pour afficher l'onboarding.
-    invoke<boolean>("is_first_launch").then((first) => {
-      if (first) setShowOnboarding(true);
-    }).catch(() => {});
+    invoke<boolean>("is_first_launch")
+      .then((first) => {
+        if (first) setShowOnboarding(true);
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
     refresh();
 
-    const unlistenEdit    = listen<boolean>("vyntra://edit-mode", (e) => setEditMode(e.payload));
+    const unlistenEdit = listen<boolean>("vyntra://edit-mode", (e) =>
+      setEditMode(e.payload),
+    );
     const unlistenWidgets = listen("vyntra://widgets-changed", () => {
       refresh();
       // Masque l'onboarding dès qu'un widget devient visible.
-      invoke<WidgetSummary[]>("list_widgets").then((ws) => {
-        if (ws.some((w) => w.visible)) setShowOnboarding(false);
-      }).catch(() => {});
+      invoke<WidgetSummary[]>("list_widgets")
+        .then((ws) => {
+          if (ws.some((w) => w.visible)) setShowOnboarding(false);
+        })
+        .catch(() => {});
     });
-    const unlistenKill    = listen<string>("widget://kill", (e) => {
+    const unlistenKill = listen<string>("widget://kill", (e) => {
       setWidgets((prev) => prev.filter((w) => w.id !== e.payload));
     });
 
@@ -101,7 +119,10 @@ export function Surface() {
     };
   }, [refresh]);
 
-  const visibleWidgets = useMemo(() => widgets.filter((w) => w.visible), [widgets]);
+  const visibleWidgets = useMemo(
+    () => widgets.filter((w) => w.visible),
+    [widgets],
+  );
 
   const handleAddStarterWidgets = useCallback(() => {
     const makeVisible = (id: string) =>
@@ -145,7 +166,8 @@ export function Surface() {
           <div className="vyntra-onboarding-card">
             <h1 className="vyntra-onboarding-title">Welcome to Vyntra</h1>
             <p className="vyntra-onboarding-hint">
-              Right-click the tray icon → <strong>Open Manager</strong> to add your first widgets.
+              Right-click the tray icon → <strong>Open Manager</strong> to add
+              your first widgets.
             </p>
             <button
               className="vyntra-onboarding-btn"
@@ -172,19 +194,22 @@ export function Surface() {
 // ─── Dev panel ────────────────────────────────────────────────────────────────
 
 const LIFECYCLE_ACTIONS = [
-  { key: "sleep",       label: "sleep",  title: "widget://sleep"      },
-  { key: "wake",        label: "wake",   title: "widget://wake"       },
-  { key: "throttle",    label: "thr",    title: "widget://throttle"   },
-  { key: "unthrottle",  label: "unthr",  title: "widget://unthrottle" },
-  { key: "kill",        label: "kill",   title: "widget://kill"       },
+  { key: "sleep", label: "sleep", title: "widget://sleep" },
+  { key: "wake", label: "wake", title: "widget://wake" },
+  { key: "throttle", label: "thr", title: "widget://throttle" },
+  { key: "unthrottle", label: "unthr", title: "widget://unthrottle" },
+  { key: "kill", label: "kill", title: "widget://kill" },
 ] as const;
 
-const DevPanel = forwardRef<HTMLDivElement, {
-  widgets: WidgetSummary[];
-  visibleCount: number;
-  editMode: boolean;
-  monitorIndex: number;
-}>(function DevPanel({ widgets, visibleCount, editMode, monitorIndex }, ref) {
+const DevPanel = forwardRef<
+  HTMLDivElement,
+  {
+    widgets: WidgetSummary[];
+    visibleCount: number;
+    editMode: boolean;
+    monitorIndex: number;
+  }
+>(function DevPanel({ widgets, visibleCount, editMode, monitorIndex }, ref) {
   const fire = (widgetId: string, action: string) =>
     emit(`widget://${action}`, widgetId);
 
@@ -199,7 +224,9 @@ const DevPanel = forwardRef<HTMLDivElement, {
       </div>
       <div className="vyntra-dev-row">
         <span>widgets</span>
-        <span>{visibleCount}/{widgets.length}</span>
+        <span>
+          {visibleCount}/{widgets.length}
+        </span>
       </div>
       <div className="vyntra-dev-row">
         <span>edit</span>

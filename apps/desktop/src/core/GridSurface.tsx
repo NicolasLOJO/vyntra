@@ -52,6 +52,7 @@ export function GridSurface({
   const { width, containerRef, mounted } = useContainerWidth();
   const [persisted, setPersisted] = useState<Record<string, LayoutEntry>>({});
   const [loaded, setLoaded] = useState(false);
+  const [debugInfo, setDebugInfo] = useState("");
   const saveTimer = useRef<number | null>(null);
   const cellRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
@@ -60,7 +61,7 @@ export function GridSurface({
     () => Math.floor(window.innerHeight / ROW_HEIGHT),
     [],
   );
-
+  console.log("GridSurface", editMode);
   useEffect(() => {
     const load = () => {
       invoke<Record<string, LayoutEntry>>("load_layout").then((p) => {
@@ -113,19 +114,22 @@ export function GridSurface({
           const r = el.getBoundingClientRect();
           return [{ x: r.left, y: r.top, w: r.width, h: r.height }];
         });
+      setDebugInfo(`notifyRects @ ${new Date().toLocaleTimeString()} — ${cssRects.length} rects — editMode=${editMode}`);
       onHitRectsChange(cssRects);
     });
     return rafId;
-  }, [myWidgets, onHitRectsChange]);
+  }, [myWidgets, onHitRectsChange, editMode]);
 
-  // Re-notify when layout or widgets change, but only once grid is mounted (cells in DOM).
+  // Re-notify when layout, widgets, or edit mode changes (edit mode off = positions are final).
   useEffect(() => {
+    console.log("notify rects");
     if (!mounted) return;
     const rafId = notifyRects();
     return () => cancelAnimationFrame(rafId);
-  }, [notifyRects, persisted, mounted]);
+  }, [notifyRects, persisted, mounted, editMode]);
 
   const onLayoutChange = (next: Layout) => {
+    console.log("onLayoutChange", next);
     if (!loaded) return;
     const obj: Record<string, LayoutEntry> = { ...persisted };
     for (const item of next) {
@@ -148,6 +152,11 @@ export function GridSurface({
       ref={containerRef}
       style={{ minHeight: "100vh", position: "relative" }}
     >
+      {import.meta.env.DEV && debugInfo && (
+        <div style={{ position: "fixed", bottom: 8, left: 8, background: "rgba(0,0,0,0.8)", color: "#0f0", fontFamily: "monospace", fontSize: 11, padding: "4px 8px", borderRadius: 4, zIndex: 9999, pointerEvents: "none" }}>
+          {debugInfo}
+        </div>
+      )}
       {mounted && (
         <>
           {editMode && (

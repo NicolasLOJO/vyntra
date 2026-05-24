@@ -12,6 +12,7 @@ target/
 src-tauri/gen/
 src-tauri/target/
 apps/desktop/src-tauri/widgets-bundled/*.vyn
+apps/desktop/.tauri/*.key
 
 # IDE
 .vscode/
