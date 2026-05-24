@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "com.vyntra.cpu-modern",
+  "name": "CPU Monitor",
+  "version": "0.1.0",
+  "author": { "name": "Vyntra" },
+  "description": "Live CPU & RAM monitor with heat-reactive design",
+  "size": { "w": 4, "h": 5 },
+  "entry": "bundle.js",
+  "permissions": { "system": true },
+  "interactive": false
+}

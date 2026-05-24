@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "com.vyntra.clock-modern",
+  "name": "Modern Clock",
+  "version": "0.1.0",
+  "author": { "name": "Vyntra" },
+  "description": "High-fidelity React clock",
+  "size": { "w": 4, "h": 2 },
+  "entry": "bundle.js",
+  "interactive": false
+}

@@ -1,16 +1,12 @@
 /**
- * Construit le bootstrap injecté dans chaque iframe widget.
+ * Injects an optional bootstrap script into each widget iframe via the
+ * `vyn:init` message.
  *
- * Le vrai pont `window.Vyn` vit dans `@vyntra/sdk`. Ce module se contente
- * d'écrire le code d'init et d'établir le canal `postMessage` <-> IPC Tauri.
+ * In practice this is a no-op: widgets already include `vyn-runtime.js`
+ * in their archive which self-initialises from the `vyn:init` message.
+ * This hook exists as an extension point for future per-widget overrides
+ * (e.g. injecting a capability-filtered Vyn proxy).
  */
 export function buildBridgeScript(): string {
-  // Stub: à étoffer quand le SDK exposera les modules.
-  return `
-    (function () {
-      window.addEventListener('message', (e) => {
-        // TODO: dispatcher vers les méthodes Vyn.*
-      });
-    })();
-  `;
+  return "";
 }

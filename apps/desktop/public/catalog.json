@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "widgets": [
+    {
+      "id": "com.vyntra.clock-modern",
+      "name": "Modern Clock",
+      "description": "A high-fidelity glass clock showing the current time and date. No permissions required.",
+      "author": "Vyntra Team",
+      "version": "0.1.0",
+      "size": { "w": 4, "h": 2 },
+      "permissions": [],
+      "tags": ["time", "clock", "utility"],
+      "interactive": false,
+      "free": true,
+      "bundled": true,
+      "download_url": null
+    },
+    {
+      "id": "com.vyntra.cpu-modern",
+      "name": "CPU Monitor",
+      "description": "Live CPU, RAM, GPU VRAM and disk usage monitor with heat-reactive amber highlights above 85%.",
+      "author": "Vyntra Team",
+      "version": "0.1.0",
+      "size": { "w": 4, "h": 5 },
+      "permissions": ["system"],
+      "tags": ["system", "monitoring", "performance"],
+      "interactive": false,
+      "free": true,
+      "bundled": true,
+      "download_url": null
+    },
+    {
+      "id": "com.vyntra.notes-modern",
+      "name": "Notes",
+      "description": "Persistent sticky note with 600 ms auto-save debounce. Your text survives restarts.",
+      "author": "Vyntra Team",
+      "version": "0.1.0",
+      "size": { "w": 5, "h": 4 },
+      "permissions": ["storage"],
+      "tags": ["productivity", "notes", "text"],
+      "interactive": true,
+      "free": true,
+      "bundled": true,
+      "download_url": null
+    },
+    {
+      "id": "com.vyntra.pomodoro-modern",
+      "name": "Pomodoro",
+      "description": "Focus timer with configurable work and break durations, animated ring and persistent session counter.",
+      "author": "Vyntra Team",
+      "version": "0.1.0",
+      "size": { "w": 4, "h": 4 },
+      "permissions": ["storage"],
+      "tags": ["productivity", "focus", "timer"],
+      "interactive": true,
+      "free": true,
+      "bundled": true,
+      "download_url": null
+    },
+    {
+      "id": "com.vyntra.launcher-modern",
+      "name": "App Launcher",
+      "description": "Quick-launch grid with live search for installed Win32 and UWP applications, including their icons.",
+      "author": "Vyntra Team",
+      "version": "0.1.0",
+      "size": { "w": 6, "h": 4 },
+      "permissions": ["launcher"],
+      "tags": ["productivity", "launcher", "apps"],
+      "interactive": true,
+      "free": true,
+      "bundled": true,
+      "download_url": null
+    },
+    {
+      "id": "com.vyntra.media-modern",
+      "name": "Now Playing",
+      "description": "Shows the current track from any Windows media source via SMTC, with artwork and playback controls.",
+      "author": "Vyntra Team",
+      "version": "0.1.0",
+      "size": { "w": 4, "h": 2 },
+      "permissions": ["media"],
+      "tags": ["media", "music", "player"],
+      "interactive": true,
+      "free": true,
+      "bundled": true,
+      "download_url": null
+    }
+  ]
+}

@@ -5,13 +5,17 @@
   "packageManager": "pnpm@11.1.1",
   "scripts": {
     "dev": "pnpm --filter @vyntra/desktop tauri dev",
+    "dev:pack": "pnpm pack:examples && pnpm --filter @vyntra/desktop tauri preview",
     "build": "pnpm --filter @vyntra/desktop tauri build",
+    "build:pack": "pnpm pack:examples && pnpm --filter @vyntra/desktop tauri build",
     "build:sdk": "pnpm --filter @vyntra/sdk build",
     "build:cli": "pnpm --filter @vyntra/cli build",
+    "pack:examples": "node scripts/pack-examples.mjs",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck"
   },
   "devDependencies": {
+    "jszip": "^3.10.1",
     "typescript": "^6.0.3"
   }
 }

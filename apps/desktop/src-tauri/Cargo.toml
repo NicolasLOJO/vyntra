@@ -19,8 +19,10 @@ vyn-manifest = { workspace = true }
 vyn-sandbox = { workspace = true }
 
 # Tauri
-tauri = { version = "2", features = ["protocol-asset", "unstable"] }
+tauri = { version = "2", features = ["protocol-asset", "tray-icon", "image-png", "unstable"] }
 tauri-plugin-shell = "2"
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-updater = "2"
 
 # Async + logs
 tokio = { workspace = true }
@@ -40,6 +42,29 @@ sysinfo = "0.31"
 parking_lot = "0.12"
 dashmap = "6"
 
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys = { version = "0.52", features = [
+    "Win32_Foundation",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_Graphics_Gdi",
+    "Win32_System_Registry",
+    "Win32_System_Com",
+    "Win32_System_Performance",
+] }
+# WinRT pour SMTC + artwork (version alignée sur celle déjà tirée par Tauri)
+windows = { version = "0.61", features = [
+    "Foundation",
+    "Media_Control",
+    "Storage_Streams",
+    "Win32_Graphics_Dxgi",
+] }
+# Effets Mica/Acrylic natifs Windows (déjà dans le lock via Tauri)
+window-vibrancy = "0.6"
+base64 = "0.22"
+png = "0.17"
+
 [features]
-default = ["custom-protocol"]
+default = ["custom-protocol", "bundled-examples"]
 custom-protocol = ["tauri/custom-protocol"]
+bundled-examples = []

@@ -49,7 +49,16 @@ pub struct Manifest {
     /// Fichier d'entrée (défaut: `bundle.js`).
     #[serde(default = "default_entry")]
     pub entry: String,
+    /// Champs de configuration exposés à l'utilisateur via le Manager.
+    #[serde(default)]
+    pub config: std::collections::HashMap<String, ConfigField>,
+    /// Si false, le widget est purement visuel : la surface reste click-through sur sa zone.
+    /// Par défaut true (safe: les widgets sont interactifs par défaut).
+    #[serde(default = "default_true")]
+    pub interactive: bool,
 }
+
+fn default_true() -> bool { true }
 
 fn default_entry() -> String {
     ENTRY_FILENAME.to_string()
@@ -100,6 +109,37 @@ pub struct Permissions {
 pub struct NetworkPolicy {
     /// Domaines autorisés. Servent à générer le CSP `connect-src`.
     pub allow: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum ConfigFieldType {
+    String,
+    Number,
+    Boolean,
+    Select,
+    Color,
+}
+
+impl Default for ConfigFieldType {
+    fn default() -> Self { Self::String }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ConfigField {
+    pub label: String,
+    #[serde(rename = "type", default)]
+    pub field_type: ConfigFieldType,
+    #[serde(default)]
+    pub description: Option<String>,
+    #[serde(default)]
+    pub default: Option<serde_json::Value>,
+    #[serde(default)]
+    pub min: Option<f64>,
+    #[serde(default)]
+    pub max: Option<f64>,
+    #[serde(default)]
+    pub options: Vec<String>,
 }
 
 impl Manifest {

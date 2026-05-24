@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "com.vyntra.launcher-modern",
+  "name": "App Launcher",
+  "version": "0.1.0",
+  "author": { "name": "Vyntra" },
+  "description": "Quick-launch grid with search for installed applications",
+  "size": { "w": 6, "h": 4 },
+  "entry": "bundle.js",
+  "permissions": { "launcher": true },
+  "interactive": true
+}

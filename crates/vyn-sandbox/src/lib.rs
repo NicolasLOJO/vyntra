@@ -49,6 +49,11 @@ pub fn check(manifest: &Manifest, cap: Capability) -> Result<(), SandboxError> {
 
 /// Génère le CSP à injecter dans la WebView pour un widget donné.
 /// `connect-src` est restreint aux domaines listés dans `network.allow`.
+///
+/// Note: on inclut `http://vyntra.localhost` en plus de `vyntra:` car
+/// WebView2 sur Windows réécrit le custom protocol en http://vyntra.localhost.
+/// `frame-ancestors` est omis intentionnellement : les widgets sont
+/// embarqués cross-origin par la surface Vyntra.
 pub fn build_csp(manifest: &Manifest) -> String {
     let connect_src = if manifest.permissions.network && !manifest.network.allow.is_empty() {
         manifest
@@ -64,11 +69,10 @@ pub fn build_csp(manifest: &Manifest) -> String {
 
     format!(
         "default-src 'none'; \
-         script-src 'self' vyntra:; \
-         style-src 'self' vyntra: 'unsafe-inline'; \
-         img-src 'self' vyntra: data:; \
-         font-src 'self' vyntra: data:; \
-         connect-src {connect_src}; \
-         frame-ancestors 'self';"
+         script-src 'self' vyntra: http://vyntra.localhost; \
+         style-src 'self' vyntra: http://vyntra.localhost 'unsafe-inline'; \
+         img-src 'self' vyntra: http://vyntra.localhost data:; \
+         font-src 'self' vyntra: http://vyntra.localhost data:; \
+         connect-src {connect_src};"
     )
 }

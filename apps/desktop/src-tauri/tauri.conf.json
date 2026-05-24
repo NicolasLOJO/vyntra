@@ -14,33 +14,50 @@
       {
         "label": "vyntra-surface",
         "title": "Vyntra",
-        "width": 1920,
-        "height": 1080,
+        "maximized": true,
         "transparent": true,
         "decorations": false,
         "skipTaskbar": true,
         "shadow": false,
-        "resizable": false,
-        "fullscreen": true
+        "resizable": false
       }
     ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self' vyntra:; style-src 'self' 'unsafe-inline' vyntra:; img-src 'self' data: vyntra:; connect-src 'self' ipc: http://ipc.localhost vyntra:;",
+      "csp": "default-src 'self'; script-src 'self' vyntra: http://vyntra.localhost; style-src 'self' 'unsafe-inline' vyntra: http://vyntra.localhost; img-src 'self' data: vyntra: http://vyntra.localhost; connect-src 'self' ipc: http://ipc.localhost vyntra: http://vyntra.localhost; frame-src 'self' vyntra: http://vyntra.localhost;",
       "assetProtocol": {
         "enable": true,
         "scope": []
       }
     }
   },
+  "plugins": {
+    "updater": {
+      "endpoints": ["https://releases.vyntra.app/{{target}}/{{arch}}/{{current_version}}.json"],
+      "dialog": false,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdEQTQ0REJFMjIxNDI3QkIKUldTN0p4UWl2azJrZlJ6amN6R29BajFhRVp3SGxWcDVxc1AvanFaZVQ1YWkzRTBvMHBIeEJFaVYK"
+    }
+  },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["nsis"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "publisher": "Vyntra",
+    "copyright": "© 2026 Vyntra",
+    "category": "Utility",
+    "shortDescription": "Modular desktop widgets for Windows",
+    "longDescription": "Vyntra is a lightweight, modular widget platform for Windows built on Tauri v2 and React.",
+    "resources": [],
+    "externalBin": [],
+    "windows": {
+      "nsis": {
+        "displayLanguageSelector": false
+      }
+    }
   }
 }

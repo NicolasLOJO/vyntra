@@ -1,23 +1,25 @@
 import { useEffect, useRef } from "react";
+import { listen } from "@tauri-apps/api/event";
 import type { WidgetSummary } from "../core/types";
 import { buildBridgeScript } from "./bridge";
+import { registerWidget, unregisterWidget } from "./registry";
 
 interface Props {
   widget: WidgetSummary;
 }
 
 /**
- * Charge un widget tiers dans un iframe sandboxé.
- *
- * Stratégie:
- * - L'iframe pointe sur `vyntra://<id>/__host__.html` (généré par le runtime).
- * - Le pont `window.Vyn` est injecté via `postMessage` après load.
- * - Le Shadow DOM est utilisé côté widget pour isoler CSS.
- *
- * À terme on pourra mutualiser tous les widgets dans une seule WebView sans
- * iframes (Shadow DOM only) — l'iframe sert ici de barrière de sécurité forte
- * et de garde-fou en attendant que l'audit de sécurité statique soit en place.
+ * URL du protocole custom selon la plateforme.
+ * - Windows: WebView2 expose le custom protocol via `http://<scheme>.localhost/`
+ * - macOS/Linux: l'URI `<scheme>://` est utilisable telle quelle.
  */
+function widgetUrl(widgetId: string, asset: string): string {
+  const isWindows = navigator.userAgent.includes("Windows");
+  return isWindows
+    ? `http://vyntra.localhost/${widgetId}/${asset}`
+    : `vyntra://${widgetId}/${asset}`;
+}
+
 export function WidgetHost({ widget }: Props) {
   const ref = useRef<HTMLIFrameElement>(null);
 
@@ -26,22 +28,66 @@ export function WidgetHost({ widget }: Props) {
     if (!iframe) return;
 
     const onLoad = () => {
-      iframe.contentWindow?.postMessage(
+      const win = iframe.contentWindow;
+      console.log("iframe loaded", win);
+      if (!win) return;
+      registerWidget(win, widget.id);
+      win.postMessage(
         { type: "vyn:init", widgetId: widget.id, bridge: buildBridgeScript() },
         "*",
       );
     };
 
     iframe.addEventListener("load", onLoad);
-    return () => iframe.removeEventListener("load", onLoad);
+    return () => {
+      iframe.removeEventListener("load", onLoad);
+      if (iframe.contentWindow) unregisterWidget(iframe.contentWindow);
+    };
+  }, [widget.id]);
+
+  // Forward watchdog lifecycle events to the widget iframe.
+  useEffect(() => {
+    const forward = (event: string) => {
+      ref.current?.contentWindow?.postMessage({ type: "vyn:event", event }, "*");
+    };
+    const forwardIf = (event: string) => (e: { payload: string }) => {
+      if (e.payload === widget.id) forward(event);
+    };
+
+    // media://change : payload global (NowPlaying), pas de filtre par widget id.
+    const forwardGlobal = (event: string) => (e: { payload: unknown }) => {
+      ref.current?.contentWindow?.postMessage(
+        { type: "vyn:event", event, payload: e.payload },
+        "*",
+      );
+    };
+
+    const forwardConfig = (e: { payload: { widget_id: string; key: string; value: unknown } }) => {
+      if (e.payload.widget_id !== widget.id) return;
+      ref.current?.contentWindow?.postMessage(
+        { type: "vyn:event", event: "config.change", payload: { key: e.payload.key, value: e.payload.value } },
+        "*",
+      );
+    };
+
+    const unsubs = [
+      listen<string>("widget://sleep",       forwardIf("lifecycle.sleep")),
+      listen<string>("widget://wake",        forwardIf("lifecycle.wake")),
+      listen<string>("widget://throttle",    forwardIf("lifecycle.throttle")),
+      listen<string>("widget://unthrottle",  forwardIf("lifecycle.unthrottle")),
+      listen("media://change",               forwardGlobal("media.change")),
+      listen("vyntra://config-changed",      forwardConfig),
+    ];
+
+    return () => { unsubs.forEach((p) => p.then((f) => f())); };
   }, [widget.id]);
 
   return (
     <iframe
       ref={ref}
       title={widget.name}
-      src={`vyntra://${widget.id}/host.html`}
-      sandbox="allow-scripts"
+      src={widgetUrl(widget.id, "host.html")}
+      sandbox="allow-scripts allow-same-origin allow-top-navigation-to-custom-protocols"
       className="vyntra-widget-frame"
     />
   );

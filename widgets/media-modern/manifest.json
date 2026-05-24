@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "com.vyntra.media-modern",
+  "name": "Now Playing",
+  "version": "0.1.0",
+  "author": { "name": "Vyntra" },
+  "description": "Media player with artwork and playback controls",
+  "size": { "w": 4, "h": 2 },
+  "entry": "bundle.js",
+  "permissions": { "media": true },
+  "interactive": true
+}

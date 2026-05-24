@@ -1,0 +1,683 @@
+/* Fenêtre normale — fond opaque, layout sidebar + contenu. */
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #15151a;
+  color: #fff;
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  overflow: hidden;
+}
+
+.manager-root {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  height: 100vh;
+}
+
+.manager-sidebar {
+  background: #0f0f13;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 22px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.manager-brand {
+  font-size: 18px;
+  font-weight: 600;
+  padding: 0 10px 18px;
+}
+
+.manager-sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.manager-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: left;
+  transition: background 120ms ease, color 120ms ease;
+}
+.manager-nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+.manager-nav-item[data-active="true"] {
+  background: rgba(90, 130, 255, 0.18);
+  color: #fff;
+}
+.manager-nav-icon {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.manager-version {
+  font-size: 11px;
+  opacity: 0.4;
+  padding: 0 10px;
+}
+
+.manager-content {
+  padding: 28px 32px;
+  overflow-y: auto;
+}
+
+/* ─── Sections (réutilisées depuis l'ancien shell) ────────── */
+.vyntra-section { display: flex; flex-direction: column; gap: 18px; }
+.vyntra-section-head h2 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 500;
+}
+.vyntra-section-head p {
+  margin: 0;
+  opacity: 0.6;
+  font-size: 13px;
+}
+
+.vyntra-drop-zone {
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+  opacity: 0.7;
+  font-size: 13px;
+  transition: all 150ms ease;
+}
+.vyntra-drop-zone:hover,
+.vyntra-drop-zone[data-busy="true"] {
+  border-color: rgba(120, 160, 255, 0.5);
+  opacity: 1;
+  background: rgba(120, 160, 255, 0.05);
+}
+
+.vyntra-error {
+  background: rgba(255, 80, 80, 0.12);
+  border: 1px solid rgba(255, 80, 80, 0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #ff9c9c;
+}
+
+.vyntra-widget-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vyntra-empty {
+  text-align: center;
+  opacity: 0.5;
+  padding: 24px;
+  font-size: 13px;
+}
+
+.vyntra-widget-row {
+  display: flex;
+  gap: 16px;
+  padding: 14px;
+  align-items: center;
+}
+
+.vyntra-widget-info { flex: 1; min-width: 0; }
+.vyntra-widget-name {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.vyntra-widget-meta {
+  font-size: 11px;
+  opacity: 0.55;
+  margin-bottom: 6px;
+}
+.vyntra-widget-meta code {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.vyntra-perms { display: flex; gap: 4px; flex-wrap: wrap; }
+.vyntra-perms-none {
+  font-size: 11px;
+  opacity: 0.4;
+  font-style: italic;
+}
+.vyntra-perm-chip {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(120, 160, 255, 0.15);
+  color: #a8c4ff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.vyntra-widget-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.vyntra-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.vyntra-toggle input { accent-color: #5b8cff; }
+
+.vyntra-btn-danger {
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 80, 80, 0.25);
+  background: transparent;
+  color: #ff9c9c;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.vyntra-btn-danger:hover { background: rgba(255, 80, 80, 0.1); }
+
+.vyntra-btn-primary {
+  padding: 7px 16px;
+  border: 1px solid rgba(90, 130, 255, 0.4);
+  background: rgba(90, 130, 255, 0.15);
+  color: #a8c4ff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.vyntra-btn-primary:hover {
+  background: rgba(90, 130, 255, 0.25);
+  border-color: rgba(90, 130, 255, 0.65);
+}
+
+.vyntra-link-btn {
+  background: none;
+  border: none;
+  color: rgba(90, 130, 255, 0.85);
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  text-decoration: underline;
+}
+.vyntra-link-btn:hover { color: #a8c4ff; }
+
+.vyntra-placeholder {
+  padding: 40px 24px;
+  text-align: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+}
+.vyntra-placeholder-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+.vyntra-placeholder p {
+  margin: 0;
+  opacity: 0.55;
+  font-size: 13px;
+  max-width: 400px;
+  margin-inline: auto;
+}
+
+.vyntra-about { padding: 20px 0; }
+.vyntra-about-logo {
+  font-size: 32px;
+  font-weight: 300;
+  margin-bottom: 4px;
+}
+.vyntra-about-version {
+  font-size: 12px;
+  opacity: 0.5;
+  margin-bottom: 20px;
+}
+.vyntra-about p {
+  font-size: 13px;
+  line-height: 1.6;
+  opacity: 0.75;
+  max-width: 500px;
+}
+.vyntra-about code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: ui-monospace, monospace;
+}
+
+/* ─── Settings ────────────────────────────────────────────── */
+.vyntra-settings-group {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.vyntra-settings-group-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.45;
+  padding: 12px 16px 8px;
+}
+
+.vyntra-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: default;
+}
+
+label.vyntra-settings-row { cursor: pointer; }
+label.vyntra-settings-row:hover { background: rgba(255, 255, 255, 0.03); }
+
+.vyntra-settings-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vyntra-settings-label > span:first-child { font-size: 13px; }
+
+.vyntra-settings-hint {
+  font-size: 11px;
+  opacity: 0.45;
+}
+
+.vyntra-toggle-input {
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: #5b8cff;
+  cursor: pointer;
+}
+
+.vyntra-settings-slider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.vyntra-settings-slider input[type="range"] {
+  width: 120px;
+  accent-color: #5b8cff;
+  cursor: pointer;
+}
+
+.vyntra-settings-shortcut { flex-shrink: 0; }
+
+.vyntra-shortcut-display,
+.vyntra-shortcut-capture {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  padding: 5px 10px;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  min-width: 100px;
+  justify-content: center;
+  transition: border-color 150ms, background 150ms;
+}
+.vyntra-shortcut-display:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.09); }
+.vyntra-shortcut-capture {
+  border-color: rgba(90,130,255,0.6);
+  background: rgba(90,130,255,0.1);
+  animation: pulse-border 1s ease-in-out infinite;
+  outline: none;
+}
+@keyframes pulse-border {
+  0%, 100% { border-color: rgba(90,130,255,0.6); }
+  50%       { border-color: rgba(90,130,255,1); }
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 11px;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  line-height: 1.4;
+}
+
+.vyntra-settings-slider-val {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+  min-width: 32px;
+  text-align: right;
+}
+
+/* ─── Widget config panel ─────────────────────────────────── */
+.vyntra-widget-item {
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.vyntra-widget-item .vyntra-widget-row {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.vyntra-btn-config {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 120ms, color 120ms, border-color 120ms;
+}
+.vyntra-btn-config:hover { background: rgba(255,255,255,0.07); color: #fff; }
+.vyntra-btn-config.active {
+  background: rgba(90,130,255,0.15);
+  border-color: rgba(90,130,255,0.4);
+  color: #a8c4ff;
+}
+
+.vyntra-config-panel {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 14px 16px 16px;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.vyntra-config-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vyntra-config-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vyntra-config-label {
+  font-size: 12px;
+  opacity: 0.7;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.vyntra-config-hint {
+  opacity: 0.5;
+  font-size: 11px;
+}
+
+.vyntra-config-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 5px 9px;
+  color: #fff;
+  font-size: 12px;
+  outline: none;
+  min-width: 0;
+  transition: border-color 120ms;
+}
+.vyntra-config-input:focus { border-color: rgba(90,130,255,0.5); }
+.vyntra-config-input::placeholder { opacity: 0.35; }
+
+.vyntra-config-select {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 5px 8px;
+  color: #fff;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+}
+.vyntra-config-select:focus { border-color: rgba(90,130,255,0.5); }
+.vyntra-config-select option { background: #1a1a22; color: #fff; }
+
+.vyntra-config-number-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+.vyntra-config-range {
+  flex: 1;
+  accent-color: #5b8cff;
+  cursor: pointer;
+}
+.vyntra-config-number-val {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+  text-align: right;
+  opacity: 0.7;
+}
+
+.vyntra-config-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #5b8cff;
+  cursor: pointer;
+}
+
+.vyntra-config-color {
+  width: 36px;
+  height: 28px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.vyntra-config-empty {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.4;
+  font-style: italic;
+}
+
+/* ─── Store ───────────────────────────────────────────────── */
+.vyntra-store-search {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 9px 14px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 150ms;
+}
+.vyntra-store-search:focus { border-color: rgba(90, 130, 255, 0.4); }
+.vyntra-store-search::placeholder { opacity: 0.35; }
+
+.vyntra-store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.vyntra-store-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 16px;
+  transition: border-color 150ms, background 150ms;
+}
+.vyntra-store-card:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.vyntra-store-card-top {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.vyntra-store-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.vyntra-store-card-meta {
+  min-width: 0;
+  flex: 1;
+}
+
+.vyntra-store-card-name {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vyntra-store-card-sub {
+  font-size: 11px;
+  opacity: 0.45;
+  margin-top: 2px;
+}
+
+.vyntra-store-card-desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  opacity: 0.65;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.vyntra-store-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.vyntra-store-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.vyntra-store-badge-installed {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.vyntra-btn-primary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.vyntra-store-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.vyntra-store-badge-builtin {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(167, 139, 250, 0.12);
+  color: #a78bfa;
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.vyntra-store-badge-interactive {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(96, 165, 250, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.vyntra-store-badge-display {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  white-space: nowrap;
+  flex-shrink: 0;
+}

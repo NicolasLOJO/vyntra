@@ -10,10 +10,17 @@ html, body, #root {
   color: #fff;
 }
 
+.vyntra-grid {
+  height: 100vh;
+}
+
 .vyntra-surface {
   position: fixed;
   inset: 0;
-  /* En mode édition, on assombrit légèrement pour montrer la grille. */
+  /* alpha=0 → le compositing Windows ne considère pas ces pixels pour le
+     hit-test (fenêtre transparent:true). Les cellules widgets ont un fond
+     non-nul et restent interactives. */
+  background: transparent;
   transition: background 200ms ease;
 }
 
@@ -22,12 +29,8 @@ html, body, #root {
 }
 
 .vyntra-cell {
-  border-radius: 14px;
-  overflow: hidden;
-  /* Liquid Glass: backdrop-filter (fallback si non supporté) */
-  backdrop-filter: blur(20px) saturate(140%);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+  height: 100%;
 }
 
 .vyntra-widget-frame {
@@ -37,40 +40,144 @@ html, body, #root {
   background: transparent;
 }
 
-.vyntra-edit-toggle {
+/* En mode édition, on neutralise les iframes pour que le drag se fasse
+   sur la cellule (sinon l'iframe capture les events). */
+.vyntra-surface[data-edit="true"] .vyntra-widget-frame {
+  pointer-events: none;
+}
+
+/* ─── Onboarding overlay ─────────────────────────────────── */
+.vyntra-onboarding-backdrop {
   position: fixed;
-  bottom: 16px;
-  right: 16px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(20, 20, 20, 0.6);
-  backdrop-filter: blur(20px);
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.vyntra-onboarding-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 48px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(24px) saturate(160%);
+  text-align: center;
+  max-width: 420px;
+  pointer-events: none;
+}
+
+.vyntra-onboarding-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
   color: #fff;
-  cursor: pointer;
+  letter-spacing: -0.01em;
+}
+
+.vyntra-onboarding-hint {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+}
+
+.vyntra-onboarding-hint strong {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.vyntra-onboarding-btn {
+  pointer-events: auto;
+  padding: 9px 22px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.10);
+  color: #fff;
+  font-family: inherit;
   font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
 }
 
-.vyntra-edit-toggle[data-active="true"] {
-  background: rgba(80, 140, 255, 0.7);
+.vyntra-onboarding-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.30);
 }
 
+.vyntra-onboarding-btn:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ─── Dev panel ──────────────────────────────────────────── */
 .vyntra-dev-panel {
   position: fixed;
   top: 12px;
   left: 12px;
   padding: 10px 14px;
   border-radius: 10px;
-  background: rgba(20, 20, 20, 0.75);
+  background: rgba(20, 20, 20, 0.82);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 12px;
+  font-size: 11px;
   font-family: ui-monospace, "Cascadia Code", monospace;
-  line-height: 1.5;
-  pointer-events: none;
+  line-height: 1.6;
+  pointer-events: auto;
+  min-width: 200px;
 }
 .vyntra-dev-panel strong {
   display: block;
   margin-bottom: 4px;
   color: #88aaff;
+  font-size: 12px;
 }
+.vyntra-dev-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  opacity: 0.7;
+}
+.vyntra-dev-divider {
+  margin: 6px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.vyntra-dev-widget-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 3px 0;
+}
+.vyntra-dev-widget-id {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+.vyntra-dev-actions {
+  display: flex;
+  gap: 3px;
+}
+.vyntra-dev-btn {
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ccc;
+  font-family: inherit;
+  font-size: 10px;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.vyntra-dev-btn:hover { background: rgba(255, 255, 255, 0.18); color: #fff; }
+.vyntra-dev-btn--sleep     { color: #7db8ff; }
+.vyntra-dev-btn--wake      { color: #7dff9e; }
+.vyntra-dev-btn--throttle  { color: #ffd97d; }
+.vyntra-dev-btn--unthrottle { color: #7dffe0; }
+.vyntra-dev-btn--kill      { color: #ff7d7d; }
