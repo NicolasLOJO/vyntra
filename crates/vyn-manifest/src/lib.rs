@@ -111,18 +111,15 @@ pub struct NetworkPolicy {
     pub allow: Vec<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum ConfigFieldType {
+    #[default]
     String,
     Number,
     Boolean,
     Select,
     Color,
-}
-
-impl Default for ConfigFieldType {
-    fn default() -> Self { Self::String }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
