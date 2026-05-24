@@ -11,7 +11,6 @@ jobs:
     permissions:
       contents: write
 
-    # Signing env vars au niveau du job so every subprocess (tauri build, etc.) sees them
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -22,11 +21,13 @@ jobs:
         include:
           - platform: windows-latest
             target: x86_64-pc-windows-msvc
-          # macOS and Linux can be uncommented when ready:
+            bundle_dir: nsis
           # - platform: macos-latest
           #   target: aarch64-apple-darwin
+          #   bundle_dir: macos
           # - platform: ubuntu-22.04
           #   target: x86_64-unknown-linux-gnu
+          #   bundle_dir: appimage
 
     runs-on: ${{ matrix.platform }}
 
@@ -64,27 +65,71 @@ jobs:
         shell: bash
         run: |
           if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
-            echo "::error::TAURI_SIGNING_PRIVATE_KEY secret is not set — add it in Settings > Secrets > Actions"
+            echo "::error::TAURI_SIGNING_PRIVATE_KEY secret is not set"
             exit 1
           fi
           echo "Signing key present (${#TAURI_SIGNING_PRIVATE_KEY} chars)"
 
-      - name: Build & release
-        uses: tauri-apps/tauri-action@v0
+      - name: Build
+        working-directory: apps/desktop
+        run: pnpm tauri build --target ${{ matrix.target }}
+
+      - name: Sign update bundle
+        shell: bash
+        run: |
+          REPO_ROOT=$(pwd)
+          BUNDLE_DIR="apps/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/${{ matrix.bundle_dir }}"
+
+          ZIP=$(find "$BUNDLE_DIR" -maxdepth 1 -name "*.nsis.zip" | head -1)
+          if [ -z "$ZIP" ]; then
+            echo "::error::No .nsis.zip found in $BUNDLE_DIR"
+            find "$BUNDLE_DIR" -maxdepth 1 2>/dev/null | head -20
+            exit 1
+          fi
+
+          echo "Signing: $ZIP"
+          (cd apps/desktop && pnpm tauri signer sign \
+            -k "$TAURI_SIGNING_PRIVATE_KEY" \
+            -p "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" \
+            "$REPO_ROOT/$ZIP")
+
+          echo "SIG_FILE=${ZIP}.sig" >> $GITHUB_ENV
+          echo "ZIP_FILE=$ZIP" >> $GITHUB_ENV
+          echo "ZIP_NAME=$(basename $ZIP)" >> $GITHUB_ENV
+
+      - name: Generate latest.json
+        shell: bash
+        run: |
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+          node scripts/generate-latest-json.mjs \
+            "$VERSION" \
+            "${{ github.ref_name }}" \
+            "$SIG_FILE" \
+            "$ZIP_NAME" \
+            "NicolasLOJO/vyntra"
+          cat latest.json
+
+      - name: Find installer
+        shell: bash
+        run: |
+          BUNDLE_DIR="apps/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/${{ matrix.bundle_dir }}"
+          INSTALLER=$(find "$BUNDLE_DIR" -maxdepth 1 -name "*-setup.exe" | head -1)
+          echo "INSTALLER=$INSTALLER" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          projectPath: ./apps/desktop
-          tagName: ${{ github.ref_name }}
-          releaseName: Vyntra ${{ github.ref_name }}
-          releaseBody: |
-            ## Installation
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "Vyntra ${{ github.ref_name }}" \
+            --notes "## Installation
 
-            Télécharge et exécute le fichier `.exe` ci-dessous pour installer Vyntra.
+          Télécharge et exécute le fichier \`.exe\` ci-dessous pour installer Vyntra.
 
-            Les mises à jour futures se feront automatiquement depuis l'application.
-          releaseDraft: false
-          prerelease: false
-          includeUpdaterJson: true
-          updaterJsonPreferNsis: true
-          args: --target ${{ matrix.target }}
+          Les mises à jour futures se feront automatiquement depuis l'application." \
+            "$INSTALLER" \
+            "$ZIP_FILE" \
+            "$SIG_FILE" \
+            latest.json
