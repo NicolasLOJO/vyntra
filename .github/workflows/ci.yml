@@ -36,6 +36,9 @@ jobs:
       - name: TypeScript check
         run: pnpm typecheck
 
+      - name: Build frontend (required by generate_context!)
+        run: pnpm pack:examples && pnpm --filter @vyntra/desktop build:vite
+
       - name: Cargo check
         run: cargo check --workspace --locked
 
