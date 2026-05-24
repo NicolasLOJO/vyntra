@@ -73,4 +73,6 @@ jobs:
             Les mises à jour futures se feront automatiquement depuis l'application.
           releaseDraft: false
           prerelease: false
+          includeUpdaterJson: true
+          updaterJsonPreferNsis: true
           args: --target ${{ matrix.target }}
