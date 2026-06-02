@@ -6,7 +6,7 @@ html, body, #root {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: #15151a;
+  background: transparent;
   color: #fff;
   font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
   font-size: 14px;
@@ -20,7 +20,7 @@ html, body, #root {
 }
 
 .manager-sidebar {
-  background: #0f0f13;
+  background: rgba(10, 10, 14, 0.82);
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   padding: 22px 12px 12px;
   display: flex;

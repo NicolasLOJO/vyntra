@@ -14,6 +14,8 @@ jobs:
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+      WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
 
     strategy:
       fail-fast: false
@@ -73,6 +75,40 @@ jobs:
       - name: Build
         working-directory: apps/desktop
         run: pnpm tauri build --target ${{ matrix.target }}
+
+      - name: Authenticode sign installer (Windows)
+        if: matrix.platform == 'windows-latest' && env.WINDOWS_CERTIFICATE != ''
+        shell: pwsh
+        run: |
+          $bundleDir = "apps/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/${{ matrix.bundle_dir }}"
+          $exe = (Get-ChildItem "$bundleDir" -MaxDepth 1 -Filter "*-setup.exe" | Select-Object -First 1).FullName
+          if (-not $exe) { Write-Error "Installer .exe not found in $bundleDir"; exit 1 }
+
+          # Decode and install certificate
+          $certPath = "$env:TEMP\vyntra-cert.pfx"
+          [System.IO.File]::WriteAllBytes($certPath, [System.Convert]::FromBase64String($env:WINDOWS_CERTIFICATE))
+
+          # Locate signtool
+          $signtool = (Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue | Where-Object { $_.FullName -match "x64" } | Select-Object -First 1).FullName
+          if (-not $signtool) { Write-Error "signtool.exe not found"; exit 1 }
+
+          Write-Host "Signing: $exe"
+          & $signtool sign `
+            /fd sha256 /td sha256 `
+            /tr http://timestamp.digicert.com `
+            /f $certPath `
+            /p $env:WINDOWS_CERTIFICATE_PASSWORD `
+            $exe
+
+          # Re-create .nsis.zip from the signed exe so the updater also ships signed binaries
+          $exeName = [System.IO.Path]::GetFileName($exe)
+          $zipPath = "$bundleDir\$exeName.nsis.zip"
+          Push-Location $bundleDir
+          Compress-Archive -Force -Path $exeName -DestinationPath $zipPath
+          Pop-Location
+
+          Remove-Item $certPath -Force
+          Write-Host "Authenticode signing complete."
 
       - name: Sign update bundle
         shell: bash
