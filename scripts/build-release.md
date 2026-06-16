@@ -33,7 +33,7 @@ pnpm --filter @vyntra/desktop tauri build
 The installer is produced at:
 
 ```
-apps/desktop/src-tauri/target/release/bundle/nsis/Vyntra_0.1.0_x64-setup.exe
+target/release/bundle/nsis/Vyntra_0.1.0_x64-setup.exe
 ```
 
 The version in the filename matches `version` in `tauri.conf.json` (and `Cargo.toml`).

@@ -10,6 +10,7 @@
     "build:pack": "pnpm pack:examples && pnpm --filter @vyntra/desktop tauri build",
     "build:sdk": "pnpm --filter @vyntra/sdk build",
     "build:cli": "pnpm --filter @vyntra/cli build",
+    "build:widget-types": "pnpm --filter @vyntra/widget-types build",
     "pack:examples": "node scripts/pack-examples.mjs",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck"

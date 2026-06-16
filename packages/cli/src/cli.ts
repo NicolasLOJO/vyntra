@@ -13,6 +13,7 @@ import { init } from "./commands/init.js";
 import { build } from "./commands/build.js";
 import { pack } from "./commands/pack.js";
 import { validate } from "./commands/validate.js";
+import { runtime } from "./commands/runtime.js";
 
 async function main() {
   const [cmd, ...args] = process.argv.slice(2);
@@ -26,6 +27,9 @@ async function main() {
       break;
     case "pack":
       await pack(args);
+      break;
+    case "runtime":
+      await runtime(args);
       break;
     case "validate":
       await validate(args);
@@ -50,6 +54,7 @@ Commands:
   vyn init <name>     Scaffold a new widget project
   vyn build           Bundle the widget into dist/
   vyn pack            Pack dist/ into a .vyn archive
+  vyn runtime [dir]   Copy vyn-runtime.js into a directory (e.g. public/)
   vyn validate <p>    Validate a manifest.json or .vyn file
 `);
 }

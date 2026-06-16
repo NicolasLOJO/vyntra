@@ -78,7 +78,7 @@ jobs:
         shell: bash
         run: |
           REPO_ROOT=$(pwd)
-          BUNDLE_DIR="apps/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/${{ matrix.bundle_dir }}"
+          BUNDLE_DIR="target/${{ matrix.target }}/release/bundle/${{ matrix.bundle_dir }}"
 
           ZIP=$(find "$BUNDLE_DIR" -maxdepth 1 -name "*.nsis.zip" | head -1)
           if [ -z "$ZIP" ]; then
@@ -113,7 +113,7 @@ jobs:
       - name: Find installer
         shell: bash
         run: |
-          BUNDLE_DIR="apps/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/${{ matrix.bundle_dir }}"
+          BUNDLE_DIR="target/${{ matrix.target }}/release/bundle/${{ matrix.bundle_dir }}"
           INSTALLER=$(find "$BUNDLE_DIR" -maxdepth 1 -name "*-setup.exe" | head -1)
           echo "INSTALLER=$INSTALLER" >> $GITHUB_ENV
 

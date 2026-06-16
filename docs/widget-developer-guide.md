@@ -257,6 +257,9 @@ pnpm create vite my-widget --template react-ts
 cd my-widget
 pnpm add @vyntra/widget-shared   # useVyn() hook (optional)
 
+# Copy vyn-runtime.js to your public/ folder so Vite bundles it automatically:
+vyn runtime public
+
 # Add vyn-runtime.js to index.html before the React script tag:
 # <script src="vyn-runtime.js"></script>
 
@@ -296,6 +299,7 @@ export default function App() {
 vyn init <name>         Scaffold a new widget project
 vyn build               Bundle src/ → dist/  (esbuild + runtime injection)
 vyn pack [dist] [out]   Zip dist/ into a .vyn archive
+vyn runtime [dir]       Copy vyn-runtime.js into a directory (e.g. public/)
 vyn validate <file>     Validate a manifest.json or .vyn file
 ```
 

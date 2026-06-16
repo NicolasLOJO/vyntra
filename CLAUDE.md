@@ -206,9 +206,10 @@ className="h-screen w-screen relative overflow-hidden rounded-2xl"
 vyn init <name>     # scaffold src/index.js + host.html + manifest.json
 vyn build           # esbuild src/index.ts|js → dist/bundle.js + inject vyn-runtime.js
 vyn pack            # zip dist/ → widget.vyn
+vyn runtime [dir]   # copie vyn-runtime.js dans un dossier (ex: public/)
 vyn validate <f>    # valide manifest.json ou .vyn
 ```
-`packages/cli/assets/vyn-runtime.js` = copie du runtime, injectée automatiquement par `vyn build`.
+`packages/cli/assets/vyn-runtime.js` = copie du runtime, injectée automatiquement par `vyn build` ou exportable via `vyn runtime`.
 
 ## Debug
 

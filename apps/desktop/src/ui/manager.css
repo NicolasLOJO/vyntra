@@ -103,6 +103,9 @@ html, body, #root {
   font-size: 13px;
   transition: all 150ms ease;
 }
+.vyntra-drop-zone:not([data-busy="true"]) {
+  cursor: pointer;
+}
 .vyntra-drop-zone:hover,
 .vyntra-drop-zone[data-busy="true"] {
   border-color: rgba(120, 160, 255, 0.5);

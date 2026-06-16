@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import type { WidgetSummary, ConfigField } from "../../core/types";
@@ -31,17 +31,39 @@ export function WidgetsSection() {
     if (expanded === w.id) setExpanded(null);
   };
 
-  const onDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    setError(null);
-    const file = e.dataTransfer.files[0];
-    if (!file || !file.name.endsWith(".vyn")) { setError("Drop a .vyn file"); return; }
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = async (file: File) => {
+    if (!file || !file.name.endsWith(".vyn")) { setError("Drop or select a .vyn file"); return; }
     setBusy(true);
+    setError(null);
     try {
       const buf = await file.arrayBuffer();
       await invoke("install_widget_bytes", { bytes: Array.from(new Uint8Array(buf)) });
     } catch (e) { setError(String(e)); }
     finally { setBusy(false); }
+  };
+
+  const onDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      await handleFileSelect(file);
+    }
+  };
+
+  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await handleFileSelect(file);
+    }
+    e.target.value = "";
+  };
+
+  const triggerFileSelect = () => {
+    if (!busy) {
+      fileInputRef.current?.click();
+    }
   };
 
   return (
@@ -50,8 +72,21 @@ export function WidgetsSection() {
         <h2>Widgets</h2>
         <p>Manage the widgets running on your desktop.</p>
       </header>
-      <div className="vyntra-drop-zone" onDragOver={(e) => e.preventDefault()} onDrop={onDrop} data-busy={busy}>
-        {busy ? "Installing…" : "Drop a .vyn file here to install"}
+      <div
+        className="vyntra-drop-zone"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={onDrop}
+        onClick={triggerFileSelect}
+        data-busy={busy}
+      >
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={onFileChange}
+          accept=".vyn"
+          style={{ display: "none" }}
+        />
+        {busy ? "Installing…" : "Drop a .vyn file here or click to select"}
       </div>
       {error && <div className="vyntra-error">{error}</div>}
       <ul className="vyntra-widget-list">
