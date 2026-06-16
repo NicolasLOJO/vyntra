@@ -1,7 +1,7 @@
 {
   "name": "vyntra",
   "private": true,
-  "version": "0.2.4",
+  "version": "0.2.5",
   "packageManager": "pnpm@11.1.1",
   "scripts": {
     "dev": "pnpm --filter @vyntra/desktop tauri dev",

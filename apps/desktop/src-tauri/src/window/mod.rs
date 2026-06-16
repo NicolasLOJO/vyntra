@@ -23,6 +23,7 @@ pub fn open_manager<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
         .resizable(true)
         .center()
         .decorations(true)
+        .transparent(true)
         .build()?;
 
     // Applique Mica (Win11 22000+) avec fallback Acrylic (Win10 1803+) sur le Manager.
